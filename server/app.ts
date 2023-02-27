@@ -3,6 +3,9 @@ import express from "express";
 import authRoute from "./routes/auth.routes";
 
 const app = express();
+
+app.use(express.json());
+
 app.use(
   cors({
     origin: "http://localhost:5173",
