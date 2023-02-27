@@ -11,11 +11,6 @@ export const registerHandler = (
     Response<any, Record<string, any>> | undefined
   > {
     const { email, password } = req.body;
-    const userExists = await User.exists({
-      email,
-    });
-    if (userExists != null)
-      return res.status(409).json({ message: "User already exists" });
 
     await User.create({ email, password });
 
@@ -25,6 +20,10 @@ export const registerHandler = (
   }
 
   handler().catch((err) => {
+    console.error(err);
+    if (err.message.indexOf("11000") !== -1)
+      return res.status(409).json({ message: "User already exists" });
+
     next(err);
   });
 };
