@@ -1,19 +1,23 @@
-import { NextFunction, Request, Response } from "express";
+import { type NextFunction, type Request, type Response } from "express";
 import jwt from "jsonwebtoken";
 
-const requireAuth = (req: Request, res: Response, next: NextFunction) => {
+const requireAuth = (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Response<any, Record<string, any>> | undefined => {
   const { authorization } = req.headers;
 
-  const unauthorized = () =>
+  const unauthorized = (): Response<any, Record<string, any>> =>
     res.status(401).json({
       message: "Unauthorized",
     });
 
-  if (!authorization) return unauthorized();
+  if (authorization == null) return unauthorized();
 
   const token = authorization.split(" ")[1];
 
-  if (!token) unauthorized();
+  if (token == null) return unauthorized();
 
   try {
     const decodedToken = jwt.verify(token, "secret");
