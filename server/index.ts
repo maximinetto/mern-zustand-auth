@@ -1,13 +1,13 @@
 import { type IncomingMessage, type Server, type ServerResponse } from "http";
 import mongoose from "mongoose";
 import app from "./app";
+import { PORT } from "./config";
 import connect from "./db/connect";
 
 let server: Server<typeof IncomingMessage, typeof ServerResponse>;
 
 connect()
   .then(() => {
-    const PORT = 3000;
     server = app.listen(PORT, () => {
       console.log(`Server running on port: ${PORT}`);
     });
