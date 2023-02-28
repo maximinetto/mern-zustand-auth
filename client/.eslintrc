@@ -1,14 +1,26 @@
 {
   "extends": [
     "standard-with-typescript",
-    "neverthrow",
     "plugin:react/recommended",
     "plugin:react/jsx-runtime",
     "plugin:react-hooks/recommended",
     "prettier"
   ],
+  "plugins": ["neverthrow"],
+  "parser": "@typescript-eslint/parser",
   "parserOptions": {
     "project": "./tsconfig.json"
+  },
+  "settings": {
+    "react": {
+      "version": "detect"
+    },
+    "import/resolver": {
+      "node": {
+        "paths": ["src"],
+        "extensions": [".js", ".jsx", ".ts", ".tsx"]
+      }
+    }
   },
   "rules": {
     "react-hooks/rules-of-hooks": "error", // Checks rules of Hooks
