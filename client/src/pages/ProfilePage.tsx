@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "../store/auth";
 
-function ProfilePage() {
+function ProfilePage(): JSX.Element {
   const navigate = useNavigate();
   const logout = useAuthStore((state) => state.logout);
   const profile = useAuthStore((state) => state.profile);

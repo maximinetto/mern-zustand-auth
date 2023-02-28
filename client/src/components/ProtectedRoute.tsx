@@ -5,9 +5,9 @@ interface Props {
   children?: React.ReactNode;
 }
 
-function ProtectedRoute({ isAllowed, children }: Props) {
+function ProtectedRoute({ isAllowed, children }: Props): JSX.Element {
   if (!isAllowed) return <Navigate to="/login" />;
-  return children ? <>{children}</> : <Outlet />;
+  return children != null ? <>{children}</> : <Outlet />;
 }
 
 export default ProtectedRoute;
