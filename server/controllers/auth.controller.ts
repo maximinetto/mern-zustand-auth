@@ -2,6 +2,14 @@ import { type NextFunction, type Request, type Response } from "express";
 import jwt from "jsonwebtoken";
 import { User } from "../models";
 
+export interface OkResponse {
+  token: string;
+}
+export interface ErrorResponse {
+  message: string;
+  reason: any[];
+}
+
 export const registerHandler = (
   req: Request,
   res: Response,
@@ -29,26 +37,41 @@ export const registerHandler = (
 };
 
 export const loginHandler = (
-  req: Request,
-  res: Response
-): Response<any, Record<string, any>> => {
-  // get request body
-  // validate the data
-  // store in database
-  // generate a jwt
+  req: Request<unknown, unknown, { email: string; password: string }>,
+  res: Response,
+  next: NextFunction
+): void => {
+  async function handler(): Promise<
+    Response<OkResponse | ErrorResponse, Record<string, any>>
+  > {
+    const { email, password } = req.body;
+    // get user from database
+    const user = await User.findOne({
+      email,
+    });
+    // compare passwords
+    const matches = password === user?.password; // improve later
+    if (!matches)
+      return res.status(401).json({ message: "Invalid email and password" });
+    // generate a jwt
 
-  const token = jwt.sign(
-    {
-      test: "test",
-    },
-    "secret",
-    {
-      expiresIn: "15m",
-    }
-  );
+    const token = jwt.sign(
+      {
+        test: "test",
+      },
+      "secret",
+      {
+        expiresIn: "15m",
+      }
+    );
+    return res.json({
+      token,
+    });
+  }
 
-  return res.json({
-    token,
+  handler().catch((err) => {
+    console.error(err);
+    next(err);
   });
 };
 
