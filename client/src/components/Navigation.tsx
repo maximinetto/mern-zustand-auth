@@ -6,7 +6,7 @@ function Navigation(): JSX.Element {
   const { logout } = useAuth();
   const navigate = useNavigate();
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>): void => {
     e.preventDefault();
     logout();
     navigate("/login");
