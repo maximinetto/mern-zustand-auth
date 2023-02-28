@@ -1,0 +1,27 @@
+{
+  "name": "mern-zustand-auth",
+  "version": "1.0.0",
+  "description": "",
+  "workspaces": [
+    "server",
+    "client"
+  ],
+  "scripts": {
+    "dev": "npm run dev --workspaces",
+    "start": "npm run start --workspace server",
+    "test:e2e": "npm run-parallel start:dev --workspaces && playwright test",
+    "test:watch": "npm run test:watch --workspace server",
+    "lint": "npm run lint --workspaces"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/maximinetto/mern-zustand-auth.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/maximinetto/mern-zustand-auth/issues"
+  },
+  "homepage": "https://github.com/maximinetto/mern-zustand-auth#readme"
+}
