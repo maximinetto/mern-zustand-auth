@@ -1,8 +1,10 @@
+import { ok } from "neverthrow";
 import { useState } from "react";
 import { Navigate, useNavigate } from "react-router-dom";
 import { loginRequest, profileRequest } from "../api/auth";
 import useIsLogged from "../hooks/useIsLogged";
 import { useAuthStore } from "../store/auth";
+import styles from "./LoginPage.module.css";
 
 export default function LoginPage(): JSX.Element {
   const [error, setError] = useState<string | null>(null);
@@ -22,9 +24,10 @@ export default function LoginPage(): JSX.Element {
     const password = (e.currentTarget.elements[1] as HTMLInputElement).value;
     const response = await loginRequest(email, password);
     response
-      .map((data) => {
+      .andThen((data) => {
         const { token } = data;
         updateToken(token);
+        return ok(true);
       })
       .map(fetchProfile)
       .mapErr((e) => {
@@ -33,13 +36,12 @@ export default function LoginPage(): JSX.Element {
   };
 
   const fetchProfile = async (): Promise<void> => {
-    console.time("profile");
     const response = await profileRequest();
-    console.timeEnd("profile");
     response
-      .map(({ profile }) => {
+      .andThen(({ profile }) => {
         updateProfile(profile);
         navigate("/");
+        return ok(true);
       })
       .mapErr((err) => {
         setError(err.message);
@@ -48,10 +50,19 @@ export default function LoginPage(): JSX.Element {
 
   return (
     <form onSubmit={handleSubmit}>
-      <input type="email" placeholder="me@email.com" />
-      <input type="password" placeholder="********" />
-      <button>Login</button>
-      <p style={{ color: "red" }}>{error}</p>
+      <label htmlFor="email">Email: </label>
+      <input id="email" name="email" type="email" placeholder="me@email.com" />
+      <label htmlFor="password">Password: </label>
+      <input
+        id="password"
+        name="password"
+        type="password"
+        placeholder="********"
+      />
+      <div className={styles.center}>
+        <button type="submit">Login</button>
+        <p className={styles.error}>{error}</p>
+      </div>
     </form>
   );
 }
