@@ -1,5 +1,5 @@
 import axios from "axios";
-import { err, ok, Result } from "neverthrow";
+import { err, ok, type Result } from "neverthrow";
 import request from "../lib/axios";
 import type { Profile } from "../store/auth";
 
@@ -8,8 +8,6 @@ export const loginRequest = async (
   password: string
 ): Promise<Result<{ token: string }, Error | { message: string }>> => {
   try {
-    console.time("login");
-
     const response = await request.post("/login", {
       email,
       password,
@@ -25,8 +23,6 @@ export const loginRequest = async (
     return error instanceof Error
       ? err(error)
       : err(new Error("Something was wrong"));
-  } finally {
-    console.timeEnd("login");
   }
 };
 
