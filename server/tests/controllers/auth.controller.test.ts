@@ -1,17 +1,46 @@
 import request from "supertest";
 import app from "../../app";
+import {
+  type ErrorResponse,
+  type OkResponse,
+} from "../../controllers/auth.controller";
 import { User } from "../../models";
 import assertDefined from "../utils/assertDefined";
 
-async function getToken(): Promise<{
+async function createADefaultUser(): Promise<{
   status: number;
-  body: { token: string };
+  body: OkResponse;
   userInfo: {
-    email: string;
-    password: string;
+    email: string | null;
+    password: string | null;
   };
 }> {
-  const userInfo = { email: "maximinetto@hello.com", password: "12345678" };
+  const userInfo = {
+    email: "maximinetto@hello.com",
+    password: "12345678",
+  };
+
+  await User.create(userInfo);
+
+  const params: string[] = Object.values(userInfo);
+  return await getToken<OkResponse>(...params);
+}
+
+async function getToken<T extends OkResponse | ErrorResponse>(
+  email?: string | null,
+  password?: string | null
+): Promise<{
+  status: number;
+  body: T;
+  userInfo: {
+    email: string | null;
+    password: string | null;
+  };
+}> {
+  const userInfo = {
+    email: typeof email !== "undefined" ? email : "maximinetto@hello.com",
+    password: typeof password !== "undefined" ? password : "12345678",
+  };
 
   const response = await request(app).post("/login").send(userInfo);
 
@@ -25,11 +54,90 @@ async function getToken(): Promise<{
 
 describe("Auth controller", () => {
   it("should login and return a token", async () => {
-    const { status, body } = await getToken();
+    const { body, status } = await createADefaultUser();
 
     expect(status).toBe(200);
     expect(body).toHaveProperty(["token"]);
     expect(body.token).toBeTypeOf("string");
+  });
+
+  it("should not login and return a 401 status code with the apropiate message", async () => {
+    const { status, body } = await getToken<OkResponse>();
+
+    expect(status).toBe(401);
+    expect(body).toEqual({ message: "Invalid email and password" });
+  });
+
+  it("should return a 400 status code when email and password are not defined", async () => {
+    const { status, body } = await getToken<ErrorResponse>(null, null);
+
+    expect(status).toBe(400);
+    expect(body).toMatchObject({
+      message: "You must be provide a valid email and password",
+    });
+    expect(body).toHaveProperty("reason");
+    expect(body.reason).toEqual([
+      {
+        code: "invalid_type",
+        expected: "string",
+        received: "null",
+        path: ["body", "email"],
+        message: "Expected string, received null",
+      },
+      {
+        code: "invalid_type",
+        expected: "string",
+        received: "null",
+        path: ["body", "password"],
+        message: "Expected string, received null",
+      },
+    ]);
+  });
+
+  it("should return a 400 status code when email or password are not defined", async () => {
+    async function passwordNotProvided(): Promise<void> {
+      const { status, body } = await getToken<ErrorResponse>(
+        "maximinetto@gmail.com",
+        null
+      );
+
+      expect(status).toBe(400);
+      expect(body).toMatchObject({
+        message: "You must be provide a valid email and password",
+      });
+      expect(body).toHaveProperty("reason");
+      expect(body.reason).toEqual([
+        {
+          code: "invalid_type",
+          expected: "string",
+          received: "null",
+          path: ["body", "password"],
+          message: "Expected string, received null",
+        },
+      ]);
+    }
+
+    async function emailNotProvided(): Promise<void> {
+      const { status, body } = await getToken<ErrorResponse>(null, "12345678");
+
+      expect(status).toBe(400);
+      expect(body).toMatchObject({
+        message: "You must be provide a valid email and password",
+      });
+      expect(body).toHaveProperty("reason");
+      expect(body.reason).toEqual([
+        {
+          code: "invalid_type",
+          expected: "string",
+          received: "null",
+          path: ["body", "email"],
+          message: "Expected string, received null",
+        },
+      ]);
+    }
+
+    await passwordNotProvided();
+    await emailNotProvided();
   });
 
   it("should create a new user with a successful message", async () => {
@@ -74,7 +182,7 @@ describe("Auth controller", () => {
   it("should get the profile and return a 200 status code", async () => {
     const {
       body: { token },
-    } = await getToken();
+    } = await createADefaultUser();
 
     const response = await request(app)
       .get("/profile")
