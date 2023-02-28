@@ -1,8 +1,10 @@
 import axios, { AxiosHeaders } from "axios";
+import { HOST_SERVER } from "../config";
 import { useAuthStore } from "../store/auth";
 
 const authApi = axios.create({
-  baseURL: "http://localhost:3000",
+  baseURL: HOST_SERVER,
+  withCredentials: true,
 });
 
 authApi.interceptors.request.use((config) => {

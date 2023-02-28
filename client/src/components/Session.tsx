@@ -15,13 +15,35 @@ export default function Session({
   }, [token, isLogged, logout]);
 
   useEffect(() => {
-    if (profile == null) return logout();
-
-    const isTokenExpired = profile.exp < Date.now() / 1000;
-    console.log({ isTokenExpired });
-    if (isTokenExpired) {
+    if (profile == null) {
       logout();
+      return;
     }
+    function validate(): void {
+      if (profile == null) {
+        logout();
+        return;
+      }
+
+      const { exp } = profile;
+      const isTokenExpired = exp * 1000 < Date.now();
+      console.log({ isTokenExpired, exp: new Date(exp * 1000) });
+      if (isTokenExpired) {
+        logout();
+      }
+    }
+
+    validate();
+    const diff = profile.exp * 1000 - Date.now();
+    let timeoutId: NodeJS.Timeout | undefined;
+    console.log({ diff });
+    if (diff > 0) {
+      timeoutId = setTimeout(validate, diff);
+    }
+
+    return () => {
+      timeoutId != null && clearTimeout(timeoutId);
+    };
   }, [profile, logout]);
 
   return <>{children}</>;
