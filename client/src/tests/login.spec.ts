@@ -1,4 +1,5 @@
 import { expect, test } from "@playwright/test";
+import "./setupUser.ts";
 
 test.describe("Login page", () => {
   test("Expect to login in the application", async ({ page, baseURL }) => {
@@ -11,12 +12,12 @@ test.describe("Login page", () => {
       .getByRole("textbox", {
         name: "email",
       })
-      .type("maximinetto@hello.com");
+      .type("maximinetto@gmail.com");
     await page
       .getByRole("textbox", {
         name: "password",
       })
-      .type("12345678");
+      .type("1234");
 
     await page.keyboard.press("Enter");
     const url = baseURL ?? "http://localhost:5173/";

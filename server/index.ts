@@ -18,7 +18,7 @@ connect()
 
 const closeServer = (): void => {
   void mongoose.disconnect();
-  server.close();
+  server?.close();
 };
 
 process.on("SIGINT", closeServer);

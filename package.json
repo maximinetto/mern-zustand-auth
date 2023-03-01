@@ -11,7 +11,8 @@
     "build": "npm run build --workspaces --if-present",
     "dev": "concurrently 'npm:dev --workspace server' 'npm:dev  --workspace client' ",
     "start": "npm run start --workspace server",
-    "test:e2e": "concurrently 'npm:start:dev --workspaces' && playwright test",
+    "start:test": "concurrently 'npm:start:test -w server' 'npm:start:test -w client'",
+    "test:e2e": "npm run test --workspace client",
     "test:watch": "npm run test:watch --workspace server",
     "lint": "npm run lint --workspaces"
   },
@@ -28,6 +29,8 @@
   "homepage": "https://github.com/maximinetto/mern-zustand-auth#readme",
   "dependencies": {
     "concurrently": "7.6.0",
+    "dotenv": "16.0.3",
+    "dotenv-cli": "7.0.0",
     "zod": "3.20.6"
   },
   "devDependencies": {

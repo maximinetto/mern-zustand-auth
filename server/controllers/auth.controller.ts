@@ -88,3 +88,15 @@ export const profileHandler = (
 
   return res.json({ message: "profile data", profile: decodedToken });
 };
+
+export const handlerReset = (
+  req: Request,
+  res: Response<unknown, { decodedToken: string }>
+): void => {
+  async function handler(): Promise<void> {
+    await User.deleteMany({});
+    res.status(204).end();
+  }
+
+  void handler();
+};

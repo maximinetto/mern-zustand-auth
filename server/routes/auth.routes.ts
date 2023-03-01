@@ -1,6 +1,7 @@
 import { loginBodySchema } from "@mern-zustand-auth/common";
 import { Router } from "express";
 import {
+  handlerReset,
   loginHandler,
   profileHandler,
   registerHandler,
@@ -17,5 +18,9 @@ router.post(
 );
 router.get("/profile", requireAuth, profileHandler);
 router.post("/register", registerHandler);
+
+if (process.env.NODE_ENV === "test") {
+  router.post("/testing/reset", handlerReset);
+}
 
 export default router;
